@@ -4,11 +4,11 @@ export const apiRequest = async (
   payload = {},
   headers = {
     "Content-Type": "application/json",
-    "access-token": "G6-Voice-API-KEY   ",
+    "access-token": "G6-Voice-API-KEY",
   }
 ) => {
   try {
-    const url = "http://192.168.3.50:6900";
+    const url = "https://websolutioncanada.com:6902";
     const response = await fetch(`${url}/${endpoint}`, {
       method,
       headers,

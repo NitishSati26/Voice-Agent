@@ -9,7 +9,6 @@ export default function Home() {
   const [response, setResponse] = useState(null);
   const [previousQuery, setPreviousQuery] = useState(null);
 
-  // 🔁 Called whenever user starts a new recording
   const handleResetBeforeRecording = () => {
     setTranscribedText("");
     setResponse(null);

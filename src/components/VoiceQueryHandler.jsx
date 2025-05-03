@@ -71,9 +71,9 @@ export default function VoiceQueryHandler({ setResponse, setTranscribedText, set
     }
 
     const payload = {
-      institute_id: "ABESIT",
+      institute_id: "SUA",
       user_name: "string",
-      authenticated_module: ["admission", "library", "employee", "fee"],
+      authenticated_module: ["student", "library", "employee", "fee"],
       query: text,
       previous_query: null,
     };

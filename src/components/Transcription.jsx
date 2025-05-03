@@ -56,9 +56,9 @@ export default function Transcription({ transcribedText, previousQuery, setRespo
     lastSubmittedTextRef.current = trimmedText;
 
     const payload = {
-      institute_id: "ABESIT",
+      institute_id: "SUA",
       user_name: "string",
-      authenticated_module: ["admission", "library", "employee", "fee"],
+      authenticated_module: ["student", "library", "employee", "fee"],
       query: trimmedText,
       previous_query: previousQuery || null,
     };
