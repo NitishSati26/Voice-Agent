@@ -9,6 +9,7 @@ export const apiRequest = async (
 ) => {
   try {
     const url = "https://websolutioncanada.com:6902";
+    // const url = "http://192.168.29.243:6900";
     const response = await fetch(`${url}/${endpoint}`, {
       method,
       headers,
