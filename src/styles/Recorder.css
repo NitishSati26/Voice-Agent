@@ -1,19 +1,140 @@
-.recorder-container {
-    text-align: center;
-    margin: 20px;
+/* .recorder-container {
+  text-align: center;
+  margin: 20px;
+}
+
+.record-btn {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.record-btn.recording {
+  background-color: #dc3545;
+} */
+
+/* .recorder-container {
+  display: flex;
+  justify-content: center;
+}
+
+.record-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.record-btn.recording {
+  background-color: #ef4444;
+  animation: pulse 1.5s infinite;
+}
+
+.record-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.record-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.icon {
+  color: white;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
   }
-  
-  .record-btn {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
   }
-  
-  .record-btn.recording {
-    background-color: #dc3545;
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
   }
-  
+} */
+
+/* .recorder-container {
+  display: flex;
+  justify-content: center;
+}
+
+.record-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.record-btn.recording {
+  background-color: #ef4444;
+  animation: pulse 1.5s infinite;
+}
+
+.record-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.record-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.icon {
+  color: white;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+} */
+
+/* Recorder.css */
+.record-btn {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.record-btn.recording {
+  color: #ef4444;
+}
+
+.record-btn:not(.recording) {
+  color: #3b82f6;
+}
+
+.record-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

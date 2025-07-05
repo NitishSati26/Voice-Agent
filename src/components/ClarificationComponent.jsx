@@ -18,10 +18,12 @@ const ClarificationComponent = ({
   const submitTimeoutRef = useRef(null);
 
   // ✅ Auto-submit logic (conditional based on the flag)
+
   useEffect(() => {
     if (!autoSubmit || !inputText.trim() || loading) return;
 
     if (submitTimeoutRef.current) clearTimeout(submitTimeoutRef.current);
+
     submitTimeoutRef.current = setTimeout(() => {
       handleSubmit();
     }, 3000); // 3 seconds debounce
@@ -78,9 +80,11 @@ const ClarificationComponent = ({
       setResponse(data);
       setPreviousQuery(null);
       setInputText("");
+
       if (isAmbiguity) setAmbiguityCount((count) => count + 1);
     } catch (error) {
       console.error("Error resolving clarification:", error);
+
       setError("Failed to resolve. Please try again.");
     } finally {
       setLoading(false);
@@ -89,11 +93,9 @@ const ClarificationComponent = ({
 
   return (
     <div className="clarification-container">
-      <h3>🤔 Clarification Needed</h3>
+      {/* <h3>🤔 Clarification Needed</h3> */}
       <p>{ambiguityText}</p>
-
       <Recorder onTranscription={setInputText} />
-
       <input
         type="text"
         value={inputText}
@@ -101,11 +103,9 @@ const ClarificationComponent = ({
         placeholder="Type clarification here"
         disabled={loading || autoSubmit}
       />
-
       <button onClick={handleSubmit} disabled={loading}>
         {loading ? "Resolving..." : "Submit"}
       </button>
-
       {error && <p className="error-text">{error}</p>}
     </div>
   );
