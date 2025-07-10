@@ -1,0 +1,8 @@
+[33ma54772b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mNitish[m[33m)[m HEAD@{0}: reset: moving to a54772b
+[33m14bdb0a[m HEAD@{1}: reset: moving to 14bdb0a
+[33m14bdb0a[m HEAD@{2}: reset: moving to HEAD~1
+[33ma54772b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mNitish[m[33m)[m HEAD@{3}: checkout: moving from Nitish to main
+[33ma54772b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mNitish[m[33m)[m HEAD@{4}: checkout: moving from main to Nitish
+[33ma54772b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mNitish[m[33m)[m HEAD@{5}: Branch: renamed refs/heads/main to refs/heads/main
+[33ma54772b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mNitish[m[33m)[m HEAD@{7}: commit: first commit
+[33m14bdb0a[m HEAD@{8}: clone: from https://github.com/TejveerShakya/Voice_assistant.git

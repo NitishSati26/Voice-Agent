@@ -1,188 +1,51 @@
-// import React, { useState, useRef, useEffect } from "react";
-// import "../styles/Recorder.css";
-
-// export default function Recorder({ onTranscription, onReset }) {
-//   const [isRecording, setIsRecording] = useState(false);
-//   const recognitionRef = useRef(null);
-
-//   useEffect(() => {
-//     if (isRecording) {
-//       startRecording();
-//     }
-//   }, [isRecording]);
-
-//   const startRecording = async () => {
-//     if (
-//       !("webkitSpeechRecognition" in window || "SpeechRecognition" in window)
-//     ) {
-//       alert("Your browser does not support speech recognition.");
-//       return;
-//     }
-
-//     if (onReset) onReset();
-//     setIsRecording(true);
-//     const SpeechRecognition =
-//       window.SpeechRecognition || window.webkitSpeechRecognition;
-//     recognitionRef.current = new SpeechRecognition();
-//     recognitionRef.current.continuous = false;
-//     recognitionRef.current.interimResults = false;
-//     recognitionRef.current.lang = "en-US";
-
-//     recognitionRef.current.onresult = (event) => {
-//       const transcript = event.results[0][0].transcript;
-//       stopRecording();
-//       if (onTranscription && typeof onTranscription === "function") {
-//         onTranscription(transcript);
-//       }
-//     };
-
-//     recognitionRef.current.onerror = (event) => {
-//       console.error("Speech Recognition Error:", event.error);
-//       setIsRecording(false);
-//     };
-
-//     recognitionRef.current.onend = () => {
-//       setIsRecording(false);
-//     };
-
-//     try {
-//       await navigator.mediaDevices.getUserMedia({ audio: true });
-//       recognitionRef.current.start();
-//     } catch (error) {
-//       console.error("Microphone access denied:", error);
-//       alert("Please allow microphone access.");
-//       setIsRecording(false);
-//     }
-//   };
-
-//   const stopRecording = () => {
-//     if (recognitionRef.current) {
-//       recognitionRef.current.stop();
-//       setIsRecording(false);
-//     }
-//   };
-
-//   return (
-//     <div className="">
-//       <button
-//         className={`record-btn ${isRecording ? "recording" : ""}`}
-//         onClick={() => setIsRecording(true)}
-//         disabled={isRecording}
-//       >
-//         {isRecording ? "Recording..." : "Start Recording"}
-//       </button>
-//     </div>
-//   );
-// }
-
-// Recorder.jsx
-// import React, { useState, useRef, useEffect } from "react";
-// import { Mic, MicOff } from "lucide-react";
-// import "../styles/Recorder.css";
-
-// export default function Recorder({ onTranscription, onReset }) {
-//   const [isRecording, setIsRecording] = useState(false);
-//   const recognitionRef = useRef(null);
-
-//   useEffect(() => {
-//     if (isRecording) {
-//       startRecording();
-//     }
-//   }, [isRecording]);
-
-//   const startRecording = async () => {
-//     if (
-//       !("webkitSpeechRecognition" in window || "SpeechRecognition" in window)
-//     ) {
-//       alert("Your browser does not support speech recognition.");
-//       return;
-//     }
-
-//     if (onReset) onReset();
-//     setIsRecording(true);
-//     const SpeechRecognition =
-//       window.SpeechRecognition || window.webkitSpeechRecognition;
-//     recognitionRef.current = new SpeechRecognition();
-//     recognitionRef.current.continuous = false;
-//     recognitionRef.current.interimResults = false;
-//     recognitionRef.current.lang = "en-US";
-
-//     recognitionRef.current.onresult = (event) => {
-//       const transcript = event.results[0][0].transcript;
-//       stopRecording();
-//       if (onTranscription && typeof onTranscription === "function") {
-//         onTranscription(transcript);
-//       }
-//     };
-
-//     recognitionRef.current.onerror = (event) => {
-//       console.error("Speech Recognition Error:", event.error);
-//       setIsRecording(false);
-//     };
-
-//     recognitionRef.current.onend = () => {
-//       setIsRecording(false);
-//     };
-
-//     try {
-//       await navigator.mediaDevices.getUserMedia({ audio: true });
-//       recognitionRef.current.start();
-//     } catch (error) {
-//       console.error("Microphone access denied:", error);
-//       alert("Please allow microphone access.");
-//       setIsRecording(false);
-//     }
-//   };
-
-//   const stopRecording = () => {
-//     if (recognitionRef.current) {
-//       recognitionRef.current.stop();
-//       setIsRecording(false);
-//     }
-//   };
-
-//   return (
-//     <button
-//       className={`record-btn ${isRecording ? "recording" : ""}`}
-//       onClick={() => setIsRecording(true)}
-//       disabled={isRecording}
-//       type="button"
-//       aria-label={isRecording ? "Stop recording" : "Start recording"}
-//     >
-//       {isRecording ? (
-//         <MicOff className="icon" size={20} />
-//       ) : (
-//         <Mic className="icon" size={20} />
-//       )}
-//     </button>
-//   );
-// }
-
-// Recorder.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { Mic, MicOff } from "lucide-react";
+import { apiRequest } from "../utils/apiRequest";
 import "../styles/Recorder.css";
 
-export default function Recorder({ onTranscription, onReset }) {
+export default function Recorder({
+  onTranscription,
+  onRecordingChange,
+  onStartNewQuery,
+  disabled,
+}) {
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef(null);
 
   useEffect(() => {
-    if (isRecording) {
-      startRecording();
-    }
+    if (onRecordingChange) onRecordingChange(isRecording);
+    // if (isRecording) startRecording();
   }, [isRecording]);
 
   const startRecording = async () => {
+    // if (
+    //   !("webkitSpeechRecognition" in window || "SpeechRecognition" in window)
+    // ) {
+    //   alert("Your browser does not support speech recognition."); // Hit APi
+    //   return;
+    // }
+
+    if (onStartNewQuery) onStartNewQuery();
+
     if (
       !("webkitSpeechRecognition" in window || "SpeechRecognition" in window)
     ) {
-      alert("Your browser does not support speech recognition.");
+      console.warn(
+        "SpeechRecognition not supported, falling back to /transcribe API"
+      );
+      try {
+        const data = await apiRequest("transcribe", "POST", {
+          user_name: "string",
+          institute_id: "SUA",
+        });
+        console.log("Transcribe response:", data);
+        if (onTranscription) onTranscription(data.transcription || "");
+      } catch (err) {
+        console.error("Transcribe API error:", err);
+      }
       return;
     }
 
-    if (onReset) onReset();
-    setIsRecording(true);
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
     recognitionRef.current = new SpeechRecognition();
@@ -193,50 +56,58 @@ export default function Recorder({ onTranscription, onReset }) {
     recognitionRef.current.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       stopRecording();
-      if (onTranscription && typeof onTranscription === "function") {
-        onTranscription(transcript);
-      }
+      if (onTranscription) onTranscription(transcript);
     };
 
     recognitionRef.current.onerror = (event) => {
-      console.error("Speech Recognition Error:", event.error);
+      console.error("Speech error:", event.error);
       setIsRecording(false);
     };
 
-    recognitionRef.current.onend = () => {
-      setIsRecording(false);
-    };
+    recognitionRef.current.onend = () => setIsRecording(false);
 
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
       recognitionRef.current.start();
-    } catch (error) {
-      console.error("Microphone access denied:", error);
-      alert("Please allow microphone access.");
+      setIsRecording(true);
+    } catch (err) {
+      alert("Microphone permission is needed.");
       setIsRecording(false);
     }
   };
 
   const stopRecording = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      setIsRecording(false);
-    }
+    if (recognitionRef.current) recognitionRef.current.stop();
+    setIsRecording(false);
   };
 
   return (
-    <button
-      className={`record-btn ${isRecording ? "recording" : ""}`}
-      onClick={() => setIsRecording(true)}
-      disabled={isRecording}
-      type="button"
-      aria-label={isRecording ? "Stop recording" : "Start recording"}
-    >
-      {isRecording ? (
-        <MicOff className="icon" size={20} />
-      ) : (
-        <Mic className="icon" size={20} />
-      )}
-    </button>
+    <>
+      {/* <div className="recorder-container"> */}
+      <button
+        className={`record-btn ${
+          isRecording ? "recording" : ""
+        } bg-transparent`}
+        // onClick={() => setIsRecording(true)}
+        onClick={startRecording}
+        disabled={isRecording || disabled}
+      >
+        {/* {isRecording ? "🎙️" : "🎤"} */}
+        {isRecording ? (
+          <MicOff
+            className="icon text-danger"
+            // style={{ color: "red" }}
+            size={20}
+          />
+        ) : (
+          <Mic
+            className="icon text-primary"
+            // style={{ color: "#2563eb" }}
+            size={20}
+          />
+        )}
+      </button>
+      {/* </div> */}
+    </>
   );
 }
