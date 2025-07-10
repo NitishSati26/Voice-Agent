@@ -4,20 +4,11 @@
 
 /* Global */
 body {
-  font-family: "Segoe UI", sans-serif;
+  font-family: "Roboto", sans-serif;
   background-color: #f5f7fa;
   color: #333;
   margin: 0;
   padding: 0;
-}
-
-.home-container {
-  max-width: 700px;
-  margin: auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
 h1,
@@ -39,21 +30,22 @@ h3 {
   text-wrap: balance;
 }
 
+/* Make recorder and submit buttons look like icons only */
 .record-btn,
-button {
-  background-color: #4f46e5;
-  color: white;
+.submit-btn {
+  background: none;
+  color: inherit;
   border: none;
-  margin-top: 10px;
-  padding: 10px 16px;
-  border-radius: 8px;
+  padding: 0;
+  margin: 0;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  font-size: 20px;
+  line-height: 1;
 }
 
 .record-btn:hover,
-button:hover {
-  background-color: #4338ca;
+.submit-btn:hover {
+  color: #4f46e5; /* optional hover color */
 }
 
 .recording {
@@ -67,6 +59,7 @@ input[type="text"] {
   border-radius: 8px;
   border: 1px solid #ccc;
   box-sizing: border-box;
+  background-color: #f3f4f6;
 }
 
 .error-text {
@@ -99,31 +92,88 @@ input[type="text"] {
   border-radius: 5px;
 }
 
-.submit-btn {
-  margin-top: 10px;
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-}
 .recorder-container {
   text-align: center;
   margin: 20px;
 }
 
-.record-btn {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 5px;
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 1rem 0;
 }
 
-.record-btn.recording {
-  margin-top: 10px;
-  background-color: #dc3545;
+.chat-bubble {
+  max-width: 70%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  word-wrap: break-word;
+}
+
+.chat-bubble.user {
+  background-color: #4f46e5;
+  color: white;
+  align-self: flex-end;
+}
+
+.chat-bubble.response {
+  background-color: #f1f1f1;
+  color: black;
+  align-self: flex-start;
+}
+
+/* Wave Animation  */
+.wave-animation {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 3px;
+}
+
+.wave-animation span {
+  display: block;
+  width: 3px;
+  height: 10px;
+  background: #4f46e5;
+  animation: wave 1.2s infinite ease-in-out;
+}
+
+/* .wave-animation span:nth-child(1) {
+  animation-delay: 0s;
+}
+.wave-animation span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.wave-animation span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.wave-animation span:nth-child(4) {
+  animation-delay: 0.6s;
+} */
+
+/* Repeat the 4-step delay pattern */
+.wave-animation span:nth-child(4n + 1) {
+  animation-delay: 0s;
+}
+.wave-animation span:nth-child(4n + 2) {
+  animation-delay: 0.2s;
+}
+.wave-animation span:nth-child(4n + 3) {
+  animation-delay: 0.4s;
+}
+.wave-animation span:nth-child(4n + 4) {
+  animation-delay: 0.6s;
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.4);
+  }
+  50% {
+    transform: scaleY(1);
+  }
 }

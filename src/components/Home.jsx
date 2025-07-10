@@ -1,259 +1,238 @@
-// import React, { useState } from "react";
-// import Header from "./Header";
-// import Modules from "./Modules";
-// import InputArea from "./InputArea";
-// import ExampleQueries from "./ExampleQueries";
-// import Transcription from "./Transcription";
-// import Response from "./Response";
-
-// const Home = () => {
-//   const [transcribedText, setTranscribedText] = useState("");
-//   const [response, setResponse] = useState(null);
-//   const [previousQuery, setPreviousQuery] = useState(null);
-
-//   const handleResetBeforeRecording = () => {
-//     setTranscribedText("");
-//     setResponse(null);
-//     setPreviousQuery(null);
-//   };
-
-//   return (
-//     <div className="col-12 d-flex flex-column h-100 p-4 rounded-3 shadow bg-white">
-//       <Header />
-//       <Modules />
-
-//       <InputArea
-//         onTranscription={setTranscribedText}
-//         onReset={handleResetBeforeRecording}
-//         transcribedText={transcribedText}
-//         setTranscribedText={setTranscribedText}
-//       />
-
-//       {transcribedText && (
-//         <Transcription
-//           autoSubmit={true}
-//           transcribedText={transcribedText}
-//           previousQuery={previousQuery}
-//           setResponse={setResponse}
-//         />
-//       )}
-
-//       {response && (
-//         <Response
-//           autoSubmit={true}
-//           response={response}
-//           setResponse={setResponse}
-//           transcribedText={transcribedText}
-//           setTranscribedText={setTranscribedText}
-//           setPreviousQuery={setPreviousQuery}
-//         />
-//       )}
-
-//       <ExampleQueries />
-//     </div>
-//   );
-// };
-
-// export default Home;
-
-// ---------------------------------------------------------------------------------------
-
-// import React, { useState, useRef, useEffect } from "react";
-// import Header from "./Header";
-// import Modules from "./Modules";
-// import InputArea from "./InputArea";
-// import ExampleQueries from "./ExampleQueries";
-// import Response from "./Response";
-// import "../styles/Home.css";
-
-// const Home = () => {
-//   const [messages, setMessages] = useState([]);
-//   const [transcribedText, setTranscribedText] = useState("");
-//   const [response, setResponse] = useState(null);
-//   const [previousQuery, setPreviousQuery] = useState(null);
-//   const messagesEndRef = useRef(null);
-
-//   // Auto-scroll to bottom when messages change
-//   useEffect(() => {
-//     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-//   }, [messages]);
-
-//   const handleResetBeforeRecording = () => {
-//     setTranscribedText("");
-//     setResponse(null);
-//     setPreviousQuery(null);
-//   };
-
-//   // Add new messages to the chat
-//   useEffect(() => {
-//     if (transcribedText) {
-//       setMessages((prev) => [
-//         ...prev,
-//         { text: transcribedText, sender: "user" },
-//       ]);
-//     }
-//   }, [transcribedText]);
-
-//   useEffect(() => {
-//     if (response) {
-//       setMessages((prev) => [
-//         ...prev,
-//         {
-//           text: response.raw_response,
-//           sender: "assistant",
-//           responseData: response,
-//         },
-//       ]);
-//     }
-//   }, [response]);
-
-//   return (
-//     <div className="chat-home-container">
-//       <Header />
-//       <Modules />
-
-//       <div className="chat-messages">
-//         {messages.map((message, index) => (
-//           <div key={index} className={`message ${message.sender}`}>
-//             {message.sender === "assistant" ? (
-//               <Response
-//                 autoSubmit={true}
-//                 response={message.responseData}
-//                 setResponse={setResponse}
-//                 transcribedText={message.text}
-//                 setTranscribedText={setTranscribedText}
-//                 setPreviousQuery={setPreviousQuery}
-//               />
-//             ) : (
-//               <div className="message-content">{message.text}</div>
-//             )}
-//           </div>
-//         ))}
-//         <div ref={messagesEndRef} />
-//       </div>
-
-//       <InputArea
-//         onTranscription={setTranscribedText}
-//         onReset={handleResetBeforeRecording}
-//         transcribedText={transcribedText}
-//         setTranscribedText={setTranscribedText}
-//       />
-
-//       <ExampleQueries />
-//     </div>
-//   );
-// };
-
-// export default Home;
-
-// -------------------------------------------------------------------------
-
 import React, { useState, useRef, useEffect } from "react";
-import Header from "./Header";
-import Modules from "./Modules";
-import InputArea from "./InputArea";
-import ExampleQueries from "./ExampleQueries";
-import Transcription from "./Transcription";
+import { SendHorizontal, Pause, Play } from "lucide-react";
+// import Modules from "./Modules";
+import Recorder from "./Recorder";
 import Response from "./Response";
-import "../styles/Home.css";
+import Example from "./Example";
 
-const Home = () => {
-  const [messages, setMessages] = useState([]);
+export default function Home({
+  chatHistory,
+  setChatHistory,
+  pendingText,
+  setPendingText,
+}) {
+  // const [selectedModules, setSelectedModules] = useState(["student"]);
   const [transcribedText, setTranscribedText] = useState("");
+  // const [pendingText, setPendingText] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
   const [response, setResponse] = useState(null);
-  const [previousQuery, setPreviousQuery] = useState(null);
-  const messagesEndRef = useRef(null);
+  // const [chatHistory, setChatHistory] = useState([]);
+  const [ambiguityMode, setAmbiguityMode] = useState(false); // NEW
+  const [lastQuery, setLastQuery] = useState("");
+  const [suggestedQueries, setSuggestedQueries] = useState([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Auto-scroll to bottom when messages change
+  const audioRef = useRef(null);
+  const timerRef = useRef(null);
+
+  // const recorderRef = useRef(null);
+
+  // const handleTranscription = (text) => {
+  //   setTranscribedText(text);
+  // };
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (!response?.summarized_response) return;
 
-  const handleResetBeforeRecording = () => {
-    setTranscribedText("");
-    setResponse(null);
-    setPreviousQuery(null);
+    // Stop previous audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsPlaying(false);
+    }
+
+    // Create new audio
+    const audio = new Audio(
+      `data:audio/mp3;base64,${response.summarized_response}`
+    );
+    audioRef.current = audio;
+
+    audio.play();
+    setIsPlaying(true);
+
+    audio.onended = () => setIsPlaying(false);
+  }, [response?.summarized_response]);
+
+  const toggleAudio = () => {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
   };
 
-  // Handle voice/text input
-  const handleInput = (text) => {
-    setTranscribedText(text);
-    setMessages((prev) => [
-      ...prev,
-      {
-        text,
-        sender: "user",
-        type: "query",
-      },
-    ]);
+  const handleTranscription = (text) => {
+    setPendingText(text);
+
+    if (timerRef.current) clearTimeout(timerRef.current);
+
+    timerRef.current = setTimeout(() => {
+      setTranscribedText(text);
+      setPendingText("");
+    }, 10000);
   };
+
+  const handleSubmit = () => {
+    if (!pendingText.trim()) return;
+
+    // ✅ RESET chat if previous response was final
+    if (response?.raw_response) {
+      setResponse(null);
+      setChatHistory([]);
+    }
+
+    if (timerRef.current) clearTimeout(timerRef.current);
+
+    setTranscribedText(pendingText.trim());
+    setPendingText("");
+  };
+
+  const handleInputKeyDown = (e) => {
+    if (e.key === "Enter" && !isLoading) {
+      handleSubmit();
+    }
+  };
+
+  const handleStartNewQuery = () => {
+    if (response?.raw_response) {
+      setResponse(null);
+      setChatHistory([]);
+    }
+  };
+
+  // const handleInputChange = (e) => {
+  //   setPendingText(e.target.value);
+  // };
+
+  // const handleInputKeyDown = (e) => {
+  //   if (e.key === "Enter") {
+  //     if (timerRef.current) clearTimeout(timerRef.current);
+  //     setTranscribedText(pendingText.trim());
+  //     setPendingText("");
+  //   }
+  // };
 
   return (
-    <div className="chat-home-container">
-      <Header />
-      <Modules />
-
-      <div className="chat-messages">
-        {messages.map((message, index) => (
-          <div key={index} className={`message ${message.sender}`}>
-            {message.sender === "assistant" ? (
-              <Response
-                autoSubmit={true}
-                response={message.responseData}
-                setResponse={setResponse}
-                transcribedText={message.text}
-                setTranscribedText={setTranscribedText}
-                setPreviousQuery={setPreviousQuery}
-              />
-            ) : (
-              <div className="message-content">{message.text}</div>
-            )}
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-
-      <InputArea
-        onTranscription={handleInput}
-        onReset={handleResetBeforeRecording}
-        transcribedText={transcribedText}
-        setTranscribedText={setTranscribedText}
-      />
-
-      {transcribedText && (
-        <Transcription
-          autoSubmit={true}
-          transcribedText={transcribedText}
-          previousQuery={previousQuery}
-          setResponse={(data) => {
-            setResponse(data);
-            setMessages((prev) => [
-              ...prev,
-              {
-                text: data.raw_response,
-                sender: "assistant",
-                type: "response",
-                responseData: data,
-              },
-            ]);
-          }}
-        />
-      )}
-
-      {response && (
+    <div
+      className="home-container container mt-3 p-4 bg-white rounded shadow-lg"
+      style={{ display: "flex", flexDirection: "column", height: "610px" }}
+    >
+      <h2
+        className="d-flex justify-content-center"
+        style={{ padding: "10px", margin: "0" }}
+      >
+        G6 Voice Assistant
+      </h2>
+      {/* <Modules
+        selectedModules={selectedModules}
+        setSelectedModules={setSelectedModules}
+      /> */}
+      <div style={{ flex: 1, overflowY: "auto" }}>
         <Response
-          autoSubmit={true}
-          response={response}
-          setResponse={setResponse}
           transcribedText={transcribedText}
           setTranscribedText={setTranscribedText}
-          setPreviousQuery={setPreviousQuery}
+          response={response}
+          setResponse={setResponse}
+          chatHistory={chatHistory}
+          setChatHistory={setChatHistory}
+          ambiguityMode={ambiguityMode}
+          setAmbiguityMode={setAmbiguityMode}
+          lastQuery={lastQuery}
+          setLastQuery={setLastQuery}
+          setSuggestedQueries={setSuggestedQueries}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+          // selectedModules={selectedModules}
         />
-      )}
+      </div>
 
-      <ExampleQueries />
+      {/* Input and Mic Container */}
+      <div
+        className="chatgpt-input-container"
+        style={{ display: "flex", padding: "10px" }}
+      >
+        <div style={{ position: "relative", flex: 1 }}>
+          <input
+            type="text"
+            className="chatgpt-input"
+            placeholder={isRecording ? "" : "Type a message or use the mic…"}
+            value={isRecording ? "" : pendingText}
+            onChange={(e) => setPendingText(e.target.value)}
+            onKeyDown={handleInputKeyDown}
+            style={{ width: "100%", paddingRight: "80px" }}
+          />
+
+          {isRecording && (
+            <div className="wave-animation">
+              {Array.from({ length: 100 }).map((_, i) => (
+                <span key={i}></span>
+              ))}
+            </div>
+          )}
+          <div
+            style={{
+              position: "absolute",
+              right: "5px",
+              top: "40%",
+              transform: "translateY(-15%)",
+              display: "flex",
+              gap: "10px",
+            }}
+          >
+            {audioRef.current && (
+              <button
+                onClick={toggleAudio}
+                disabled={!audioRef.current}
+                className="p-0 border-0 bg-transparent"
+              >
+                {isPlaying ? (
+                  <Pause
+                    className="icon text-danger"
+                    // style={{ color: "red" }}
+                    size={20}
+                  />
+                ) : (
+                  <Play
+                    className="icon text-primary"
+                    // style={{ color: "#2563eb" }}
+                    size={20}
+                  />
+                )}
+              </button>
+            )}
+
+            <Recorder
+              onTranscription={handleTranscription}
+              onRecordingChange={setIsRecording}
+              onStartNewQuery={handleStartNewQuery}
+              disabled={isLoading}
+            />
+
+            <button
+              className="submit-btn"
+              onClick={handleSubmit}
+              disabled={isLoading}
+            >
+              <SendHorizontal
+                className="icon text-primary"
+                // style={{ color: "#2563eb" }}
+                size={20}
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <Example
+        suggestedQueries={suggestedQueries}
+        onSelect={(query) => setPendingText(query)}
+      />
+      {/* <Recorder onTranscription={handleTranscription} /> */}
     </div>
   );
-};
-
-export default Home;
+}

@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 
-const Modules = () => {
-  const modules = ["Fees", "Employee", "Admission", "Hostel"];
+const Modules = ({ selectedModules, setSelectedModules }) => {
+  const modules = ["student", "library", "employee", "fee"];
 
-  const [selectedModule, setSelectedModule] = useState("Fees");
-
-  const handleModuleClick = (module) => {
-    setSelectedModule(module);
-    // You can add additional logic here when a module is selected
+  const toggleModule = (module) => {
+    setSelectedModules((prev) =>
+      prev.includes(module)
+        ? prev.filter((m) => m !== module)
+        : [...prev, module]
+    );
   };
 
   return (
@@ -16,12 +17,12 @@ const Modules = () => {
         {modules.map((module) => (
           <button
             key={module}
-            className={`btn rounded px-3 ${
-              module === selectedModule
-                ? "btn-primary" // Active module
-                : "btn-outline-primary" // Inactive modules
+            className={`btn rounded px-3 text-capitalize ${
+              selectedModules.includes(module)
+                ? "btn-primary"
+                : "btn-outline-primary"
             }`}
-            onClick={() => handleModuleClick(module)}
+            onClick={() => toggleModule(module)}
           >
             {module}
           </button>
