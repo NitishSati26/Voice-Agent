@@ -22,7 +22,7 @@ export default function History({ history = [], onClose, onSelect }) {
   const combinedHistory = [
     ...localQueries.map((query) => ({ message: query })),
     // ...history,
-  ];
+  ].reverse();
 
   return (
     <div
