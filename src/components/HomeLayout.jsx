@@ -8,7 +8,24 @@ export default function HomeLayout() {
   const [chatHistory, setChatHistory] = useState([]);
   const [pendingText, setPendingText] = useState("");
 
-  const toggleHistory = () => setShowHistory(!showHistory);
+  // const toggleHistory = () => setShowHistory(!showHistory);
+
+  const toggleHistory = () => {
+    try {
+      setShowHistory((prev) => !prev);
+    } catch (err) {
+      console.error("Failed to toggle history:", err);
+    }
+  };
+
+  const handleSelectQuery = (query) => {
+    try {
+      setPendingText(query);
+      setShowHistory(false);
+    } catch (err) {
+      console.error("Failed to select query from history:", err);
+    }
+  };
 
   return (
     <div className="d-flex">
@@ -26,10 +43,7 @@ export default function HomeLayout() {
           <History
             history={chatHistory.filter((h) => h.type === "user")}
             onClose={toggleHistory}
-            onSelect={(query) => {
-              setPendingText(query);
-              setShowHistory(false); // optional: close History after click
-            }}
+            onSelect={handleSelectQuery}
           />
         )}
 

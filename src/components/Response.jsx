@@ -58,7 +58,6 @@ export default function Response({
         const data = await apiRequest("process_query", "POST", payload);
         setResponse(data);
         setLastQuery(query); // Save latest query
-        setLastQuery(query);
 
         const expiry = Date.now() + 24 * 60 * 60 * 1000; // 1 day later
         const stored = JSON.parse(localStorage.getItem("queryHistory") || "[]");
@@ -99,6 +98,13 @@ export default function Response({
         setTranscribedText("");
       } catch (err) {
         console.error("Query Error:", err);
+        setChatHistory((prev) => [
+          ...prev,
+          {
+            type: "response",
+            message: "An error occurred while processing the query.",
+          },
+        ]);
       } finally {
         setIsLoading(false);
       }
@@ -125,6 +131,7 @@ export default function Response({
           : isAmbiguity
           ? "process_ambiguity"
           : "specified_module";
+
       const payload =
         endpoint === "one_shot_processing"
           ? {
@@ -190,6 +197,13 @@ export default function Response({
         setTranscribedText("");
       } catch (err) {
         console.error("Clarification Error:", err);
+        setChatHistory((prev) => [
+          ...prev,
+          {
+            type: "response",
+            message: "An error occurred during clarification.",
+          },
+        ]);
       } finally {
         setIsLoading(false);
       }

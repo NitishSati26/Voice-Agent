@@ -38,33 +38,41 @@ export default function Home({
     if (!response?.summarized_response) return;
 
     // Stop previous audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setIsPlaying(false);
+    try {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        setIsPlaying(false);
+      }
+
+      // Create new audio
+      const audio = new Audio(
+        `data:audio/mp3;base64,${response.summarized_response}`
+      );
+      audioRef.current = audio;
+
+      audio.play();
+      setIsPlaying(true);
+
+      audio.onended = () => setIsPlaying(false);
+    } catch (err) {
+      console.error("Error playing audio:", err);
     }
-
-    // Create new audio
-    const audio = new Audio(
-      `data:audio/mp3;base64,${response.summarized_response}`
-    );
-    audioRef.current = audio;
-
-    audio.play();
-    setIsPlaying(true);
-
-    audio.onended = () => setIsPlaying(false);
   }, [response?.summarized_response]);
 
   const toggleAudio = () => {
-    if (!audioRef.current) return;
+    try {
+      if (!audioRef.current) return;
 
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play();
-      setIsPlaying(true);
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        audioRef.current.play();
+        setIsPlaying(true);
+      }
+    } catch (err) {
+      console.error("Toggle audio failed:", err);
     }
   };
 
@@ -83,18 +91,22 @@ export default function Home({
   };
 
   const handleSubmit = () => {
-    if (!pendingText.trim()) return;
+    try {
+      if (!pendingText.trim()) return;
 
-    // ✅ RESET chat if previous response was final
-    if (response?.raw_response) {
-      setResponse(null);
-      setChatHistory([]);
+      // ✅ RESET chat if previous response was final
+      if (response?.raw_response) {
+        setResponse(null);
+        setChatHistory([]);
+      }
+
+      if (timerRef.current) clearTimeout(timerRef.current);
+
+      setTranscribedText(pendingText.trim());
+      setPendingText("");
+    } catch (err) {
+      console.error("Submit failed:", err);
     }
-
-    if (timerRef.current) clearTimeout(timerRef.current);
-
-    setTranscribedText(pendingText.trim());
-    setPendingText("");
   };
 
   const handleInputKeyDown = (e) => {
@@ -104,9 +116,13 @@ export default function Home({
   };
 
   const handleStartNewQuery = () => {
-    if (response?.raw_response) {
-      setResponse(null);
-      setChatHistory([]);
+    try {
+      if (response?.raw_response) {
+        setResponse(null);
+        setChatHistory([]);
+      }
+    } catch (err) {
+      console.error("Start new query failed:", err);
     }
   };
 
