@@ -15,6 +15,7 @@ export default function Home({
   const [transcribedText, setTranscribedText] = useState("");
   // const [pendingText, setPendingText] = useState("");
   const [isRecording, setIsRecording] = useState(false);
+  const [isFallback, setIsFallback] = useState(false);
   const [response, setResponse] = useState(null);
   // const [chatHistory, setChatHistory] = useState([]);
   const [ambiguityMode, setAmbiguityMode] = useState(false); // NEW
@@ -222,8 +223,18 @@ export default function Home({
               onTranscription={handleTranscription}
               onRecordingChange={setIsRecording}
               onStartNewQuery={handleStartNewQuery}
+              onFallbackChange={setIsFallback}
               disabled={isLoading}
             />
+
+            {isFallback && isRecording && (
+              <button
+                className="btn btn-sm btn-danger"
+                onClick={() => setIsRecording(false)}
+              >
+                Stop
+              </button>
+            )}
 
             <button
               className="submit-btn"

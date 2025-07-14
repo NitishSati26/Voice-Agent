@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
+import { Loader2 } from "lucide-react";
 import Feedback from "./Feedback";
 import { apiRequest } from "../utils/apiRequest";
 
@@ -48,7 +49,7 @@ export default function Response({
         authenticated_module: ["student", "library", "employee", "fee"],
         // authenticated_module: selectedModules,
         query,
-        suggested_query: [],
+        // suggested_query: [],
       };
 
       setIsLoading(true);
@@ -247,6 +248,17 @@ export default function Response({
           );
         })}
         <div ref={chatEndRef} />
+        {/* {isLoading && (
+          <div className="loading-spinner text-center my-2">
+            <span className="spinner-border spinner-border-sm"></span> Loading…
+          </div>
+        )} */}
+        {isLoading && (
+          <div className="text-center py-2">
+            <Loader2 className="text-primary animate-spin" size={20} />
+            <span className="ms-2">Loading…</span>
+          </div>
+        )}
       </div>
     </div>
   );
