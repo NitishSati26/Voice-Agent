@@ -17,10 +17,12 @@ export default function Recorder({
   const audioChunksRef = useRef([]);
 
   useEffect(() => {
-    if (onRecordingChange) onRecordingChange(isRecording);
-    if (onFallbackChange) onFallbackChange(isFallback);
+    // if (onRecordingChange) onRecordingChange(isRecording);
+    // if (onFallbackChange) onFallbackChange(isFallback);
+    onRecordingChange && onRecordingChange(isRecording);
+    onFallbackChange && onFallbackChange(isFallback);
     // if (isRecording) startRecording();
-  }, [isRecording, isFallback]);
+  }, [isRecording, isFallback, onRecordingChange, onFallbackChange]);
 
   const fallbackToMediaRecorder = async () => {
     console.log("Using MediaRecorder fallback…");
@@ -69,14 +71,15 @@ export default function Recorder({
       }, 7000);
     } catch (err) {
       console.error("Microphone access denied or error:", err);
-      alert("Microphone permission is needed.");
+      // alert("Microphone permission is needed.");
       setIsRecording(false);
       setIsFallback(false);
     }
   };
 
   const startRecording = async () => {
-    if (onStartNewQuery) onStartNewQuery();
+    // if (onStartNewQuery) onStartNewQuery();
+    onStartNewQuery?.();
 
     // Check if browser supports SpeechRecognition
     if (
@@ -98,15 +101,16 @@ export default function Recorder({
     recognitionRef.current.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       stopRecording();
-      if (onTranscription) onTranscription(transcript);
+      // if (onTranscription) onTranscription(transcript);
+      onTranscription?.(transcript);
     };
 
     recognitionRef.current.onerror = (event) => {
-      console.error("Speech error:", event.error);
+      console.error("SpeechRecognition error:", event.error);
       setIsRecording(false);
 
       if (event.error === "network") {
-        console.warn("SpeechRecognition network error, falling back");
+        // console.warn("SpeechRecognition network error, falling back");
         fallbackToMediaRecorder();
       }
     };
@@ -120,7 +124,7 @@ export default function Recorder({
       setIsFallback(false);
     } catch (err) {
       console.error("Microphone access denied or error:", err);
-      alert("Microphone permission is needed.");
+      // alert("Microphone permission is needed.");
       setIsRecording(false);
     }
   };

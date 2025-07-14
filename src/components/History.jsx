@@ -6,17 +6,22 @@ export default function History({ history = [], onClose, onSelect }) {
   const [localQueries, setLocalQueries] = useState([]);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("queryHistory") || "[]");
-    const now = Date.now();
+    try {
+      const stored = JSON.parse(localStorage.getItem("queryHistory") || "[]");
+      const now = Date.now();
 
-    // Filter out expired queries
-    const valid = stored.filter((item) => now < item.expiry);
+      // Filter out expired queries
+      const valid = stored.filter((item) => now < item.expiry);
 
-    // Update state
-    setLocalQueries(valid.map((item) => item.query));
+      // Update state
+      setLocalQueries(valid.map((item) => item.query));
 
-    // Remove expired from localStorage
-    localStorage.setItem("queryHistory", JSON.stringify(valid));
+      // Remove expired from localStorage
+      localStorage.setItem("queryHistory", JSON.stringify(valid));
+    } catch (err) {
+      console.error("Failed to read or parse query history:", err);
+      setLocalQueries([]);
+    }
   }, []);
 
   const combinedHistory = [

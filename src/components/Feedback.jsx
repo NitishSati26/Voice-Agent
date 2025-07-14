@@ -7,31 +7,40 @@ export default function Feedback({ requestId }) {
   const [commentList, setCommentList] = useState([]);
   const [comment, setComment] = useState("");
   const [userAction, setUserAction] = useState(null); // "like" | "unlike"
+  const [error, setError] = useState(null);
 
   // Load saved feedback if exists
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("feedbackList") || "{}");
-    if (stored[requestId]) {
-      const { likeCount, unlikeCount, commentList, userAction } =
-        stored[requestId];
-      setLikeCount(likeCount);
-      setUnlikeCount(unlikeCount);
-      setCommentList(commentList);
-      setUserAction(userAction);
+    try {
+      const stored = JSON.parse(localStorage.getItem("feedbackList") || "{}");
+      if (stored[requestId]) {
+        const { likeCount, unlikeCount, commentList, userAction } =
+          stored[requestId];
+        setLikeCount(likeCount);
+        setUnlikeCount(unlikeCount);
+        setCommentList(commentList);
+        setUserAction(userAction);
+      }
+    } catch (err) {
+      console.error("Failed to load feedback from localStorage:", err);
     }
   }, [requestId]);
 
   // Save to localStorage
   const saveFeedback = (updated) => {
-    const stored = JSON.parse(localStorage.getItem("feedbackList") || "{}");
-    stored[requestId] = {
-      likeCount,
-      unlikeCount,
-      commentList,
-      userAction,
-      ...updated,
-    };
-    localStorage.setItem("feedbackList", JSON.stringify(stored));
+    try {
+      const stored = JSON.parse(localStorage.getItem("feedbackList") || "{}");
+      stored[requestId] = {
+        likeCount,
+        unlikeCount,
+        commentList,
+        userAction,
+        ...updated,
+      };
+      localStorage.setItem("feedbackList", JSON.stringify(stored));
+    } catch (err) {
+      console.error("Failed to save feedback:", err);
+    }
   };
 
   const handleLike = async () => {
@@ -50,11 +59,16 @@ export default function Feedback({ requestId }) {
       userAction: "like",
     });
 
-    await apiRequest("feedback", "POST", {
-      request_id: requestId,
-      feedback_score: 1,
-      comment: "",
-    });
+    try {
+      await apiRequest("feedback", "POST", {
+        request_id: requestId,
+        feedback_score: 1,
+        comment: "",
+      });
+    } catch (err) {
+      console.error("Failed to submit like feedback:", err);
+      setError("Failed to submit like.");
+    }
   };
 
   const handleUnlike = async () => {
@@ -72,11 +86,16 @@ export default function Feedback({ requestId }) {
       userAction: "unlike",
     });
 
-    await apiRequest("feedback", "POST", {
-      request_id: requestId,
-      feedback_score: -1,
-      comment: "",
-    });
+    try {
+      await apiRequest("feedback", "POST", {
+        request_id: requestId,
+        feedback_score: -1,
+        comment: "",
+      });
+    } catch (err) {
+      console.error("Failed to submit unlike feedback:", err);
+      setError("Failed to submit dislike.");
+    }
   };
 
   const handleCommentSubmit = async () => {
@@ -88,11 +107,16 @@ export default function Feedback({ requestId }) {
     setComment("");
     saveFeedback({ commentList: updatedComments });
 
-    await apiRequest("feedback", "POST", {
-      request_id: requestId,
-      feedback_score: 0,
-      comment: trimmed,
-    });
+    try {
+      await apiRequest("feedback", "POST", {
+        request_id: requestId,
+        feedback_score: 0,
+        comment: trimmed,
+      });
+    } catch (err) {
+      console.error("Failed to submit comment:", err);
+      setError("Failed to submit comment.");
+    }
   };
 
   return (
@@ -131,6 +155,7 @@ export default function Feedback({ requestId }) {
         >
           Submit Comment
         </button>
+        {error && <p className="text-danger mt-2 small">{error}</p>}
       </div>
 
       {/* Show existing comments */}
