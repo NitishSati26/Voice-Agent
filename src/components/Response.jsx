@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import Feedback from "./Feedback";
 import { apiRequest } from "../utils/apiRequest";
 
 export default function Response({
@@ -17,14 +18,27 @@ export default function Response({
   setIsLoading,
   selectedModules,
 }) {
+  const [ambiguityCount, setAmbiguityCount] = useState(0);
   const chatEndRef = useRef(null);
 
   // scroll to bottom on chatHistory change
+  // useEffect(() => {
+  //   if (chatEndRef.current) {
+  //     chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // }, [chatHistory]);
+
   useEffect(() => {
-    if (chatEndRef.current) {
+    const lastMessage = chatHistory[chatHistory.length - 1];
+
+    // Don't scroll if it's a JSON string (likely a raw_response)
+    const shouldScroll =
+      !isJsonString(lastMessage?.message) || !response?.raw_response;
+
+    if (chatEndRef.current && shouldScroll) {
       chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [chatHistory]);
+  }, [chatHistory, response]);
 
   const handleQuery = useCallback(
     async (query) => {
@@ -80,6 +94,7 @@ export default function Response({
           setAmbiguityMode(false);
         }
 
+        setAmbiguityCount(0);
         setTranscribedText("");
       } catch (err) {
         console.error("Query Error:", err);
@@ -102,32 +117,60 @@ export default function Response({
     async (input) => {
       const isAmbiguity = response?.ambiguity != null;
 
-      const endpoint = isAmbiguity ? "process_ambiguity" : "specified_module";
-      const payload = isAmbiguity
-        ? {
-            input,
-            chat_history: response.chat_history,
-            query: response.query,
-            module: response.module,
-            user_name: "string",
-            institute_id: "SUA",
-            authenticated_module: ["student", "library", "employee", "fee"],
-            // authenticated_module: selectedModules,
-          }
-        : {
-            // prev_input: response?.query,
-            prev_input: lastQuery,
-            input_text: input,
-            user_name: "string",
-            institute_id: "SUA",
-            authenticated_module: ["student", "library", "employee", "fee"],
-            // authenticated_module: selectedModules,
-          };
+      // const endpoint = isAmbiguity ? "process_ambiguity" : "specified_module";
+      const endpoint =
+        ambiguityCount >= 3
+          ? "one_shot_processing"
+          : isAmbiguity
+          ? "process_ambiguity"
+          : "specified_module";
+      const payload =
+        endpoint === "one_shot_processing"
+          ? {
+              query: input,
+              module: response?.module,
+              user_name: "string",
+              institute_id: "SUA",
+              authenticated_module: ["student", "library", "employee", "fee"],
+              // authenticated_module: selectedModules,
+            }
+          : isAmbiguity
+          ? {
+              input,
+              chat_history: response.chat_history,
+              query: response.query,
+              module: response.module,
+              user_name: "string",
+              institute_id: "SUA",
+              authenticated_module: ["student", "library", "employee", "fee"],
+              // authenticated_module: selectedModules,
+            }
+          : {
+              // prev_input: response?.query,
+              prev_input: lastQuery,
+              input_text: input,
+              user_name: "string",
+              institute_id: "SUA",
+              authenticated_module: ["student", "library", "employee", "fee"],
+              // authenticated_module: selectedModules,
+            };
 
       setIsLoading(true);
 
       try {
         const data = await apiRequest(endpoint, "POST", payload);
+
+        // Reset counter on success
+        if (!data.ambiguity && !data.fallback) {
+          setAmbiguityCount(0);
+          setAmbiguityMode(false);
+        } else if (endpoint === "process_ambiguity") {
+          setAmbiguityCount((prev) => prev + 1);
+          setAmbiguityMode(true);
+        } else {
+          setAmbiguityMode(false);
+        }
+
         setResponse(data);
         setChatHistory((prev) => [
           ...prev,
@@ -137,11 +180,11 @@ export default function Response({
           },
         ]);
 
-        if (data.ambiguity || data.fallback) {
-          setAmbiguityMode(true);
-        } else {
-          setAmbiguityMode(false);
-        }
+        // if (data.ambiguity || data.fallback) {
+        //   setAmbiguityMode(true);
+        // } else {
+        //   setAmbiguityMode(false);
+        // }
 
         setTranscribedText("");
       } catch (err) {
@@ -153,6 +196,7 @@ export default function Response({
     [
       response,
       lastQuery,
+      ambiguityCount,
       setResponse,
       setChatHistory,
       setAmbiguityMode,
@@ -185,7 +229,13 @@ export default function Response({
           if (isJsonString(item.message)) {
             return (
               <div key={idx} style={{ margin: "10px 0" }}>
-                <JsonTable json={item.message} />
+                {/* <JsonTable json={item.message} /> */}
+                <>
+                  <JsonTable json={item.message} />
+                  {response?.raw_response && idx === chatHistory.length - 1 && (
+                    <Feedback requestId={response?.request_id} />
+                  )}
+                </>
               </div>
             );
           }

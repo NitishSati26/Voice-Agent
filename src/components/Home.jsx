@@ -22,6 +22,7 @@ export default function Home({
   const [suggestedQueries, setSuggestedQueries] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasEdited, setHasEdited] = useState(false);
 
   const audioRef = useRef(null);
   const timerRef = useRef(null);
@@ -68,12 +69,15 @@ export default function Home({
 
   const handleTranscription = (text) => {
     setPendingText(text);
+    setHasEdited(false);
 
     if (timerRef.current) clearTimeout(timerRef.current);
 
     timerRef.current = setTimeout(() => {
-      setTranscribedText(text);
-      setPendingText("");
+      if (!hasEdited) {
+        setTranscribedText(text);
+        setPendingText("");
+      }
     }, 10000);
   };
 
@@ -162,7 +166,15 @@ export default function Home({
             className="chatgpt-input"
             placeholder={isRecording ? "" : "Type a message or use the mic…"}
             value={isRecording ? "" : pendingText}
-            onChange={(e) => setPendingText(e.target.value)}
+            onChange={(e) => {
+              setPendingText(e.target.value);
+              setHasEdited(true); // user started editing
+              // clear the timer when editing
+              if (timerRef.current) {
+                clearTimeout(timerRef.current);
+                timerRef.current = null;
+              }
+            }}
             onKeyDown={handleInputKeyDown}
             style={{ width: "100%", paddingRight: "80px" }}
           />
