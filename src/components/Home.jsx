@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { SendHorizontal, Pause, Play } from "lucide-react";
-// import Modules from "./Modules";
+import Modules from "./Modules";
 import Recorder from "./Recorder";
 import Response from "./Response";
 import Example from "./Example";
@@ -11,7 +11,12 @@ export default function Home({
   pendingText,
   setPendingText,
 }) {
-  // const [selectedModules, setSelectedModules] = useState(["student"]);
+  const [selectedModules, setSelectedModules] = useState([
+    "student",
+    "fee",
+    "employee",
+    "library",
+  ]);
   const [transcribedText, setTranscribedText] = useState("");
   // const [pendingText, setPendingText] = useState("");
   const [isRecording, setIsRecording] = useState(false);
@@ -149,10 +154,10 @@ export default function Home({
       >
         G6 Voice Assistant
       </h2>
-      {/* <Modules
+      <Modules
         selectedModules={selectedModules}
         setSelectedModules={setSelectedModules}
-      /> */}
+      />
       <div style={{ flex: 1, overflowY: "auto" }}>
         <Response
           transcribedText={transcribedText}
