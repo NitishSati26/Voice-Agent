@@ -42,7 +42,11 @@ export default function Response({
   }, [chatHistory, response]);
 
   const handleQuery = useCallback(
-    async (query) => {
+    async (query, isUserQuery = false) => {
+      if (isUserQuery) {
+        setChatHistory((prev) => [...prev, { type: "user", message: query }]);
+      }
+
       const payload = {
         institute_id: "SUA",
         user_name: "string",
@@ -56,6 +60,7 @@ export default function Response({
 
       try {
         const data = await apiRequest("process_query", "POST", payload);
+        if (!data) throw new Error("Empty response received");
         setResponse(data);
         setLastQuery(query); // Save latest query
 
@@ -68,16 +73,18 @@ export default function Response({
         // save back
         localStorage.setItem("queryHistory", JSON.stringify(stored));
 
-        setSuggestedQueries(
-          data.suggested_query || [
-            "Give me the Employee details of Mohit",
-            "Give me the Aadhar Number of Harsh",
-            "What is the total marks of student Rohit",
-            "List the student having maximum marks",
-            "List the student who has maximum percentage in MCA",
-            "What is the total count of students in ABESIT",
-          ]
-        );
+        if (data.suggested_query) {
+          setSuggestedQueries(
+            data.suggested_query || [
+              "Give me the Employee details of Mohit",
+              "Give me the Aadhar Number of Harsh",
+              "What is the total marks of student Rohit",
+              "List the student having maximum marks",
+              "List the student who has maximum percentage in MCA",
+              "What is the total count of students in ABESIT",
+            ]
+          );
+        }
 
         setChatHistory((prev) => [
           ...prev,
@@ -88,11 +95,13 @@ export default function Response({
         ]);
 
         // If response is ambiguity or fallback, go into clarification mode
-        if (data.ambiguity || data.fallback) {
-          setAmbiguityMode(true);
-        } else {
-          setAmbiguityMode(false);
-        }
+        // if (data.ambiguity || data.fallback) {
+        //   setAmbiguityMode(true);
+        // } else {
+        //   setAmbiguityMode(false);
+        // }
+
+        setAmbiguityMode(!!(data.ambiguity || data.fallback));
 
         setAmbiguityCount(0);
         setTranscribedText("");
@@ -122,8 +131,9 @@ export default function Response({
 
   const handleClarification = useCallback(
     async (input) => {
-      const isAmbiguity = response?.ambiguity != null;
+      setChatHistory((prev) => [...prev, { type: "user", message: input }]);
 
+      const isAmbiguity = response?.ambiguity != null;
       // const endpoint = isAmbiguity ? "process_ambiguity" : "specified_module";
       const endpoint =
         ambiguityCount >= 3
@@ -223,11 +233,11 @@ export default function Response({
   useEffect(() => {
     if (!transcribedText.trim()) return;
     const trimmed = transcribedText.trim();
-    setChatHistory((prev) => [...prev, { type: "user", message: trimmed }]);
+    // setChatHistory((prev) => [...prev, { type: "user", message: trimmed }]);
     if (ambiguityMode) {
       handleClarification(trimmed);
     } else {
-      handleQuery(trimmed);
+      handleQuery(trimmed, true); // <-- Pass true so user message is only logged once
     }
   }, [
     transcribedText,
